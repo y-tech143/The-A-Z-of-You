@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A Special Surprise for You</title>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #ff758c;
+            --secondary: #ff7eb3;
+            --glass: rgba(255, 255, 255, 0.25);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #ff758c 0%, #ff7eb3 100%);
+            min-height: 100vh;
+            color: white;
+            overflow: hidden; /* Lock scroll initially */
+            position: relative;
+        }
+
+        /* --- RED FLOATING HEARTS (Z-INDEX 1) --- */
+        .heart { 
+            position: fixed; 
+            bottom: -50px; 
+            color: #ff0000; 
+            font-size: 20px;
+            user-select: none;
+            pointer-events: none; 
+            z-index: 1; 
+            animation: floatUp linear forwards;
+            text-shadow: 0 0 10px rgba(255, 0, 0, 0.4);
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(-115vh) rotate(360deg); opacity: 0; }
+        }
+
+        /* --- PAGE 1: PRE-WELCOME --- */
+        #pre-welcome {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: #ff758c;
+            z-index: 100;
+            position: fixed;
+            width: 100%;
+            transition: 0.8s ease-in-out;
+        }
+
+        .gift-box {
+            font-size: 80px;
+            cursor: pointer;
+            animation: pulseGift 2s infinite;
+        }
+
+        @keyframes pulseGift {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        /* --- PAGE 2: TYPEWRITER --- */
+        #welcome-page {
+            height: 100vh;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+            z-index: 50;
+        }
+
+        h1#typewriter-text {
+            font-family: 'Dancing Script', cursive;
+            font-size: 3.5rem;
+            min-height: 80px;
+        }
+
+        .cursor { animation: blink 1s infinite; }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+        /* --- PAGE 3: MAIN A-Z --- */
+        #main-content {
+            display: none;
+            padding: 20px;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            z-index: 10;
+            position: relative;
+            overflow-y: auto;
+        }
+
+        .btn-back {
+            background: rgba(255,255,255,0.3);
+            border: 1px solid rgba(255,255,255,0.5);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            align-self: flex-start;
+            margin-bottom: 20px;
+            font-weight: 600;
+            z-index: 20;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            width: 100%;
+            max-width: 500px;
+            padding: 20px;
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            border-radius: 25px;
+            border: 1px solid rgba(255,255,255,0.3);
+            z-index: 15;
+        }
+
+        .letter-btn {
+            aspect-ratio: 1;
+            border: none;
+            background: white;
+            color: var(--primary);
+            font-size: 1.2rem;
+            font-weight: 700;
+            border-radius: 12px;
+        }
+
+        /* --- POPUP & BUTTONS --- */
+        .btn-main {
+            background: white;
+            color: var(--primary);
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            display: none;
+            margin-top: 30px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        #display-card {
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0);
+            width: 85%; max-width: 350px; background: white; color: #333; padding: 30px; border-radius: 25px;
+            text-align: center; z-index: 1000; transition: 0.4s;
+        }
+        #display-card.active { transform: translate(-50%, -50%) scale(1); }
+        
+        #overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; z-index: 999; }
+
+        footer { margin-top: 30px; padding-bottom: 20px; opacity: 0.7; font-size: 0.8rem; z-index: 10;}
+    </style>
+</head>
+<body>
+
+    <audio id="bgMusic" loop preload="auto">
+        <source src="https://videotourl.com/audio/1775629886776-da4aca87-a8d7-4459-aebd-11112324dad8.mp3" type="audio/mpeg">
+    </audio>
+
+    <div id="pre-welcome" onclick="goToTypewriter()">
+        <div class="gift-box">🎁</div>
+        <p style="margin-top:20px; letter-spacing: 2px;">CLICK TO OPEN</p>
+    </div>
+
+    <div id="welcome-page">
+        <h1><span id="typewriter-text"></span><span class="cursor">|</span>❤️</h1>
+        <p id="sub-msg" style="display:none; margin-top: 10px; opacity: 0.8;">Turn up the volume! 🔊</p>
+        <button class="btn-main" id="start-btn" onclick="startExperience()">Something for you ✨</button>
+    </div>
+
+    <div id="main-content">
+        <button class="btn-back" onclick="goBack()">🔙 Back</button>
+        <h2 style="font-family:'Dancing Script'; font-size: 2.5rem; margin-bottom: 20px; text-align: center;">The A-Z of You</h2>
+        <div class="grid-container" id="grid"></div>
+        <footer>Made with ❤️ by Yashuu</footer>
+    </div>
+
+    <div id="overlay"></div>
+    <div id="display-card">
+        <h1 id="cardLetter" style="font-family:'Dancing Script'; color:var(--primary); font-size:4rem;"></h1>
+        <h2 id="cardWord" style="margin:10px 0; font-size: 1.8rem;"></h2>
+        <p id="cardDesc" style="color:#666; font-size:0.95rem; line-height: 1.5;"></p>
+        <button class="btn-main" style="display:inline-block; padding:10px 25px; font-size:1rem; margin-top:20px;" onclick="closeCard()">Close</button>
+    </div>
+
+    <script>
+        // NAVIGATION 1 -> 2
+        function goToTypewriter() {
+            document.getElementById('pre-welcome').style.opacity = '0';
+            setTimeout(() => {
+                document.getElementById('pre-welcome').style.display = 'none';
+                document.getElementById('welcome-page').style.display = 'flex';
+                typeWriter();
+            }, 800);
+        }
+
+        // TYPEWRITER
+        const textToType = "Hey Special... ";
+        let typeIndex = 0;
+        function typeWriter() {
+            if (typeIndex < textToType.length) {
+                document.getElementById("typewriter-text").innerHTML += textToType.charAt(typeIndex);
+                typeIndex++;
+                setTimeout(typeWriter, 150);
+            } else {
+                document.getElementById("sub-msg").style.display = "block";
+                document.getElementById("start-btn").style.display = "inline-block";
+            }
+        }
+
+        // START A-Z PAGE (SONG + HEARTS START HERE)
+        let heartInterval;
+        function startExperience() {
+            document.getElementById('welcome-page').style.display = 'none';
+            document.getElementById('main-content').style.display = 'flex';
+            document.body.style.overflowY = 'auto'; 
+            
+            generateGrid();
+
+            // MUSIC START AT 1:40
+            const music = document.getElementById('bgMusic');
+            music.currentTime = 100; // 1:40
+            music.play().catch(e => console.log("Audio Play Error: ", e));
+
+            // HEARTS START
+            heartInterval = setInterval(createHeart, 300);
+        }
+
+        // BACK BUTTON
+        function goBack() {
+            document.getElementById('main-content').style.display = 'none';
+            document.getElementById('pre-welcome').style.display = 'flex';
+            document.getElementById('pre-welcome').style.opacity = '1';
+            
+            const music = document.getElementById('bgMusic');
+            music.pause();
+            music.currentTime = 100;
+
+            clearInterval(heartInterval);
+            document.getElementById("typewriter-text").innerHTML = "";
+            typeIndex = 0;
+            document.getElementById("start-btn").style.display = "none";
+            document.getElementById("sub-msg").style.display = "none";
+            document.body.style.overflow = 'hidden';
+        }
+
+        // HEART SYSTEM
+        function createHeart() {
+            const heart = document.createElement('div');
+            heart.classList.add('heart');
+            heart.innerHTML = '❤️';
+            heart.style.left = Math.random() * 100 + 'vw';
+            const size = Math.random() * 20 + 15 + 'px';
+            heart.style.fontSize = size;
+            const duration = Math.random() * 3 + 3;
+            heart.style.animationDuration = duration + 's';
+            document.body.appendChild(heart);
+            setTimeout(() => { heart.remove(); }, duration * 1000);
+        }
+
+        // GRID DATA
+        const azData = {
+            'A': { word: 'Adorable', desc: 'The way you smile can brighten up the darkest of days.' },
+            'B': { word: 'Brilliant', desc: 'Your mind is as beautiful as your face.' },
+            'C': { word: 'Caring', desc: 'You have a heart of gold, always thinking about others.' },
+            'D': { word: 'Dazzling', desc: 'You literally sparkle whenever you walk into a room.' },
+            'E': { word: 'Elegant', desc: 'Everything you do, you do it with such grace.' },
+            'F': { word: 'Fairytale', desc: 'Knowing you feels like a dream come true.' },
+            'G': { word: 'Genuine', desc: 'In a world of fakes, you are the most real person I know.' },
+            'H': { word: 'Healing', desc: 'Just talking to you makes all my stress disappear.' },
+            'I': { word: 'Incredible', desc: 'There is no other word to describe how amazing you are.' },
+            'J': { word: 'Joyful', desc: 'You carry a vibe that makes everyone happy.' },
+            'K': { word: 'Kind', desc: 'Your kindness is your superpower.' },
+            'L': { word: 'Luminous', desc: 'You glow from within. Truly one of a kind.' },
+            'M': { word: 'Mesmerizing', desc: 'I could listen to you talk for hours.' },
+            'N': { word: 'Noble', desc: 'Your thoughts and values are so high and inspiring.' },
+            'O': { word: 'Optimistic', desc: 'I love how you always find the silver lining.' },
+            'P': { word: 'Perfect', desc: 'To me, you are perfect exactly the way you are.' },
+            'Q': { word: 'Queen', desc: 'You deserve to be treated like royalty.' },
+            'R': { word: 'Radiant', desc: 'Your energy is contagious and full of life.' },
+            'S': { word: 'Soulful', desc: 'There is a depth in you that is truly beautiful.' },
+            'T': { word: 'Thoughtful', desc: 'You remember the little things that matter.' },
+            'U': { word: 'Unique', desc: 'They broke the mold after they made you.' },
+            'V': { word: 'Vibrant', desc: 'You bring so much color into my world.' },
+            'W': { word: 'Wonderful', desc: 'Every moment with you is a wonder.' },
+            'X': { word: 'X-factor', desc: 'You have that special something no one else has.' },
+            'Y': { word: 'Youthful', desc: 'Your spirit is so free and full of life.' },
+            'Z': { word: 'Zealous', desc: 'Your passion for things you love is inspiring.' }
+        };
+
+        function generateGrid() {
+            const grid = document.getElementById('grid');
+            if (grid.children.length > 0) return;
+            Object.keys(azData).forEach(letter => {
+                const btn = document.createElement('button');
+                btn.className = 'letter-btn';
+                btn.innerText = letter;
+                btn.onclick = () => showCard(letter);
+                grid.appendChild(btn);
+            });
+        }
+
+        function showCard(l) {
+            document.getElementById('cardLetter').innerText = l;
+            document.getElementById('cardWord').innerText = azData[l].word;
+            document.getElementById('cardDesc').innerText = azData[l].desc;
+            document.getElementById('overlay').style.display = 'block';
+            document.getElementById('display-card').classList.add('active');
+        }
+
+        function closeCard() {
+            document.getElementById('overlay').style.display = 'none';
+            document.getElementById('display-card').classList.remove('active');
+        }
+        document.getElementById('overlay').onclick = closeCard;
+    </script>
+</body>
+</html>
